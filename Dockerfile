@@ -2,11 +2,13 @@ FROM python:3.10-slim
 
 WORKDIR /rembg
 
-COPY . .
 RUN pip install --upgrade pip
-RUN python -m pip install .
-RUN python -c 'from rembg.bg import download_models; download_models()'
 
-EXPOSE 5000
+COPY . .
+
+RUN python -m pip install ".[cpu,cli]"
+RUN rembg d
+
+EXPOSE 7000
 ENTRYPOINT ["rembg"]
 CMD ["--help"]

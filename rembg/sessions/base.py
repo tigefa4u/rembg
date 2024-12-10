@@ -8,6 +8,8 @@ from PIL.Image import Image as PILImage
 
 
 class BaseSession:
+    """This is a base class for managing a session with a machine learning model."""
+
     def __init__(
         self,
         model_name: str,
@@ -16,6 +18,7 @@ class BaseSession:
         *args,
         **kwargs
     ):
+        """Initialize an instance of the BaseSession class."""
         self.model_name = model_name
 
         self.providers = []
@@ -29,7 +32,7 @@ class BaseSession:
             self.providers.extend(_providers)
 
         self.inner_session = ort.InferenceSession(
-            str(self.__class__.download_models()),
+            str(self.__class__.download_models(*args, **kwargs)),
             providers=self.providers,
             sess_options=sess_opts,
         )
@@ -43,7 +46,7 @@ class BaseSession:
         *args,
         **kwargs
     ) -> Dict[str, np.ndarray]:
-        im = img.convert("RGB").resize(size, Image.LANCZOS)
+        im = img.convert("RGB").resize(size, Image.Resampling.LANCZOS)
 
         im_ary = np.array(im)
         im_ary = im_ary / np.max(im_ary)

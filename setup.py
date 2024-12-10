@@ -11,6 +11,53 @@ here = pathlib.Path(__file__).parent.resolve()
 
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
+install_requires = [
+    "jsonschema",
+    "numpy",
+    "opencv-python-headless",
+    "pillow",
+    "pooch",
+    "pymatting",
+    "scikit-image",
+    "scipy",
+    "tqdm",
+]
+
+extras_require = {
+    "dev": [
+        "bandit",
+        "black",
+        "flake8",
+        "imagehash",
+        "isort",
+        "mypy",
+        "pytest",
+        "setuptools",
+        "twine",
+        "wheel",
+    ],
+    "cpu": ["onnxruntime"],
+    "gpu": ["onnxruntime-gpu"],
+    "cli": [
+        "aiohttp",
+        "asyncer",
+        "click",
+        "fastapi",
+        "filetype",
+        "gradio",
+        "python-multipart",
+        "uvicorn",
+        "watchdog",
+    ],
+}
+
+entry_points = {
+    "console_scripts": [
+        "rembg=rembg.cli:main",
+    ],
+}
+
+
 setup(
     name="rembg",
     description="Remove image background",
@@ -33,39 +80,14 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     ],
     keywords="remove, background, u2net",
-    packages=["rembg", "rembg.sessions", "rembg.commands"],
-    python_requires=">=3.8, <3.12",
-    install_requires=[
-        "aiohttp",
-        "asyncer",
-        "click",
-        "fastapi",
-        "filetype",
-        "gradio",
-        "imagehash",
-        "numpy",
-        "onnxruntime",
-        "opencv-python-headless",
-        "pillow",
-        "pooch",
-        "pymatting",
-        "python-multipart",
-        "scikit-image",
-        "scipy",
-        "tqdm",
-        "uvicorn",
-        "watchdog",
-    ],
-    entry_points={
-        "console_scripts": [
-            "rembg=rembg.cli:main",
-        ],
-    },
-    extras_require={
-        "gpu": ["onnxruntime-gpu"],
-    },
+    python_requires=">=3.8, <3.13",
+    packages=find_packages(),
+    install_requires=install_requires,
+    entry_points=entry_points,
+    extras_require=extras_require,
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
 )

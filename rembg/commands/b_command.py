@@ -6,14 +6,14 @@ import sys
 from typing import IO
 
 import click
-from PIL import Image
+from PIL.Image import Image as PILImage
 
 from ..bg import remove
 from ..session_factory import new_session
 from ..sessions import sessions_names
 
 
-@click.command(
+@click.command(  # type: ignore
     name="b",
     help="for a byte stream as input",
 )
@@ -74,7 +74,7 @@ from ..sessions import sessions_names
 @click.option(
     "-bgc",
     "--bgcolor",
-    default=None,
+    default=(0, 0, 0, 0),
     type=(int, int, int, int),
     nargs=4,
     help="Background color (R G B A) to replace the removed background with",
@@ -94,7 +94,7 @@ from ..sessions import sessions_names
     "image_height",
     type=int,
 )
-def rs_command(
+def b_command(
     model: str,
     extras: str,
     image_width: int,
@@ -102,12 +102,28 @@ def rs_command(
     output_specifier: str,
     **kwargs
 ) -> None:
+    """
+    Command-line interface for processing images by removing the background using a specified model and generating a mask.
+
+    This CLI command takes several options and arguments to configure the background removal process and save the processed images.
+
+    Parameters:
+        model (str): The name of the model to use for background removal.
+        extras (str): Additional options in JSON format that can be passed to customize the background removal process.
+        image_width (int): The width of the input images in pixels.
+        image_height (int): The height of the input images in pixels.
+        output_specifier (str): A printf-style specifier for the output filenames. If specified, the processed images will be saved to the specified output directory with filenames generated using the specifier.
+        **kwargs: Additional keyword arguments that can be used to customize the background removal process.
+
+    Returns:
+        None
+    """
     try:
         kwargs.update(json.loads(extras))
     except Exception:
         pass
 
-    session = new_session(model)
+    session = new_session(model, **kwargs)
     bytes_per_img = image_width * image_height * 3
 
     if output_specifier:
@@ -118,7 +134,7 @@ def rs_command(
         if not os.path.isdir(output_dir):
             os.makedirs(output_dir, exist_ok=True)
 
-    def img_to_byte_array(img: Image) -> bytes:
+    def img_to_byte_array(img: PILImage) -> bytes:
         buff = io.BytesIO()
         img.save(buff, format="PNG")
         return buff.getvalue()
@@ -146,7 +162,7 @@ def rs_command(
                 if not img_bytes:
                     break
 
-                img = Image.frombytes("RGB", (image_width, image_height), img_bytes)
+                img = PILImage.frombytes("RGB", (image_width, image_height), img_bytes)
                 output = remove(img, session=session, **kwargs)
 
                 if output_specifier:

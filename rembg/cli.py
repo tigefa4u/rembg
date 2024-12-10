@@ -6,9 +6,11 @@ from .commands import command_functions
 
 @click.group()
 @click.version_option(version=_version.get_versions()["version"])
-def main() -> None:
+def _main() -> None:
     pass
 
 
 for command in command_functions:
-    main.add_command(command)
+    _main.add_command(command)
+
+_main()
